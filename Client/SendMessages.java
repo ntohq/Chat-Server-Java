@@ -5,13 +5,14 @@ public class SendMessages implements Runnable
 {
    DataOutputStream outputStream;
    String textToSend;
-   Scanner userInput = new Scanner(System.in);
+   Scanner userInput;
    String name;
 
-   public SendMessages(DataOutputStream EstablishedOutputStream, String userName)
+   public SendMessages(DataOutputStream EstablishedOutputStream, String userName, Scanner EstablishedUserInput)
    {
       outputStream = EstablishedOutputStream;
       name = userName;
+      userInput = EstablishedUserInput;
    }
 
    public void run() 

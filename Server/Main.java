@@ -13,13 +13,13 @@ import java.net.*;
 
 class Main {
    public static Vector<ClientHandler> clientsConnected = new Vector<>();
-   static int clientCount = 0;
+   public static int clientCount = 0;
    final static int ServerPort = 7600; 
    public static void main(String[] args) {
       Boolean isOnline = true;
       Socket userSocket;
       ServerSocket serverSocketHandler;
-      int connectionCount = 1;
+      int connectionCount = 0;
       Thread newThread;
       ClientHandler newUserConnection;
 
@@ -28,6 +28,7 @@ class Main {
             serverSocketHandler = new ServerSocket(ServerPort);
 
             while (isOnline) {
+               System.out.println("Server Status: Running\n Total Connections: " + connectionCount);
                userSocket = serverSocketHandler.accept();
                System.out.printf("Connected made! Transfering Socket(" + userSocket + ") to Handler. \n");
 
@@ -36,7 +37,7 @@ class Main {
 
                System.out.println("Sending user connection information to handler");
                String name = inputStream.readUTF();
-               newUserConnection = new ClientHandler(userSocket, ("connection #" + connectionCount), name, outputStream, inputStream);
+               newUserConnection = new ClientHandler(userSocket, ("connection #" + (connectionCount + 1)), name, outputStream, inputStream);
                clientsConnected.add(newUserConnection);
                newThread = new Thread(newUserConnection);
                newThread.start();
