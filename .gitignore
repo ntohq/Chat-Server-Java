@@ -1,3 +1,6 @@
 *.class
 /Client/*.class
 /Server/*.class
+/Server/class_files/*
+/Server/class_files/linux/*
+/Server/class_files/windows/*
