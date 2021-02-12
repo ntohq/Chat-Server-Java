@@ -11,6 +11,8 @@ Documentation:
 
 import java.io.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.net.*;
 
 public class ClientHandler implements Runnable {
@@ -20,9 +22,10 @@ public class ClientHandler implements Runnable {
    Socket userSocket;
    String name;
 
-   public ClientHandler(Socket usersSocket, String client, String newUsersName, DataOutputStream DataOutStream, DataInputStream DataInStream) {
+   public ClientHandler(Socket usersSocket, String client, String newUsersName, DataOutputStream DataOutStream,
+         DataInputStream DataInStream) {
       inputStream = DataInStream;
-      outputStream = DataOutStream; 
+      outputStream = DataOutStream;
       userSocket = usersSocket;
       name = newUsersName;
       System.out.println(client + "\n User's name is : " + name);
@@ -46,22 +49,38 @@ public class ClientHandler implements Runnable {
             
             for (ClientHandler client : Main.clientsConnected)
             {
-             // Send Messages
-             if(!(client.name.equals(name))){
-               client.outputStream.writeUTF(senderId + "# " + recivedMessage);
-             } 
+               if (!(recivedMessage.replaceFirst("^\\s*", "").substring(0,1).toLowerCase().equals("/")))
+               {
+                  if(!(client.name.equals(name)))
+                  {
+                     client.outputStream.writeUTF(senderId + "#" + recivedMessage);
+                     continue;
+                  }
+                  continue;
+               } else {
+                  if(client.name.equals(name))
+                  {
+                     if (recivedMessage.replaceFirst("^\\s*", "").toLowerCase().substring(1).equals("help"))
+                     {
+                        client.outputStream.writeUTF("Server# I'm Here to help! 911!");
+                        break;
+                     } else if(recivedMessage.replaceFirst("^\\s*", "").toLowerCase().substring(1).equals("time"));
+                     {
+                        client.outputStream.writeUTF("Server# " + new SimpleDateFormat("'Date:' MM-dd-yyyy 'Time' HH:mm:ss").format(new Date(System.currentTimeMillis())));
+                     }
+                  }
+               }
             }
          } catch(EOFException a)
          {
             System.out.println("Error...Disconecting " + name);
             try 
             {
-               Vector<ClientHandler> clients = Main.clientsConnected;
                for(ClientHandler client : Main.clientsConnected)
                {
                   if (client.name.equals(name))
                   {
-                     clients.removeElement(client);
+                     Main.clientsConnected.removeElement(client);
                   }
                }
                Main.clientCount--;
@@ -71,7 +90,7 @@ public class ClientHandler implements Runnable {
                break;
             } catch(Exception b)
             {
-               System.out.println(b);
+               b.printStackTrace();
             }
          } catch (Exception e)
          {

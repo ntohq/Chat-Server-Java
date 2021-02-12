@@ -7,7 +7,9 @@ public class ReciveMessages implements Runnable
    DataInputStream inputStream;
    static StringTokenizer parsedTextRecived;
    static String user, messageRecived;
-   
+   public static final String ANSI_CYAN = "\u001B[36m";
+   public static final String ANSI_WHITE = "\u001B[37m";
+
    public ReciveMessages(DataInputStream EstablishedInputStream)
    {
       inputStream = EstablishedInputStream;
@@ -24,7 +26,7 @@ public class ReciveMessages implements Runnable
             parsedTextRecived = new StringTokenizer(recivedText, "#");
             user = parsedTextRecived.nextToken();
             messageRecived = parsedTextRecived.nextToken();
-            System.out.println("@" + user + ": " + messageRecived);
+            System.out.println(ANSI_CYAN +  "@" + user + ":" + ANSI_WHITE + messageRecived);
          }
          catch(EOFException a)
          {
