@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
    DataOutputStream outputStream;
    Socket userSocket;
    String name;
+   Boolean isConnected;
 
    public ClientHandler(Socket usersSocket, String client, String newUsersName, DataOutputStream DataOutStream, DataInputStream DataInStream) 
    {
@@ -27,6 +28,7 @@ public class ClientHandler implements Runnable {
       outputStream = DataOutStream;
       userSocket = usersSocket;
       name = newUsersName;
+      isConnected = true;
       System.out.println(client + "\n User's name is : " + name);
    }
 
@@ -34,7 +36,7 @@ public class ClientHandler implements Runnable {
    {
       String recievedTexted;
 
-      while(true)
+      while(isConnected)
       {
          try
          {
@@ -45,32 +47,46 @@ public class ClientHandler implements Runnable {
             StringTokenizer recievedTextTokenized = new StringTokenizer(recievedTexted, "#");
             String senderId = recievedTextTokenized.nextToken();
             String recivedMessage = recievedTextTokenized.nextToken();
+            String recipient, dm; 
+            recipient = recivedMessage.substring(2).split(" ")[0];
+            dm = recivedMessage.replaceFirst("^\\s*", "").substring((recipient.length() + 1));
+                  
             
             for (ClientHandler client : Main.clientsConnected)
             {
-               if (!(recivedMessage.replaceFirst("^\\s*", "").substring(0,1).toLowerCase().equals("/")))
-               {
-                  if(!(client.name.equals(name)))
-                  {
-                     client.outputStream.writeUTF(senderId + "#" + recivedMessage);
-                     continue;
-                  }
-                  continue;
-               } else {
+               if(recivedMessage.replaceFirst("^\\s*", "").substring(0,1).equals("/")) {
                   if(client.name.equals(name))
                   {
-                     if (recivedMessage.replaceFirst("^\\s*", "").toLowerCase().substring(1).equals("help"))
+                     String command = recivedMessage.replaceFirst("^\\s*", "").substring(1).toLowerCase();
+                     System.out.println(command);
+                     if (command.equalsIgnoreCase("help"))
                      {
                         client.outputStream.writeUTF("Server# I'm Here to help! 911!");
-                        break;
-                     } else if(recivedMessage.replaceFirst("^\\s*", "").toLowerCase().substring(1).equals("time"));
+                     } 
+                     else if(command.equalsIgnoreCase("time"))
                      {
                         client.outputStream.writeUTF("Server# " + new SimpleDateFormat("'Date:' MM-dd-yyyy 'Time' HH:mm:ss").format(new Date(System.currentTimeMillis())));
-                        break;
+                     }
+                     else 
+                     {
+                        client.outputStream.writeUTF("Server# The command you have entered is not recognized.");
                      }
                      
                   }
                }
+               else if(recivedMessage.replaceFirst("^\\s*", "").substring(0,1).equals("@"))
+               {
+                  if(client.name.equals(recipient))
+                  {
+                     client.outputStream.writeUTF("Direct Message from: " + name + "#" + dm);
+                  }
+               } else
+               {
+                  if(!(client.name.equals(name)))
+                  {
+                     client.outputStream.writeUTF(senderId + "#" + recivedMessage);
+                  }
+               } 
             }
          } catch(EOFException a)
          {
@@ -88,7 +104,7 @@ public class ClientHandler implements Runnable {
                userSocket.close();
                inputStream.close();
                outputStream.close();
-               break;
+               isConnected = false;
             } catch(Exception b)
             {
                b.printStackTrace();

@@ -25,8 +25,9 @@ public class SendMessages implements Runnable
          {
             outputStream.writeUTF(name + "# " + textToSend);
 
-            if (textToSend.toLowerCase().equals("logout"))
+            if (textToSend.toLowerCase().equals("/logout"))
             {
+               System.out.println("We made it here");
                System.exit(0);
             }
          } catch(Exception e) 

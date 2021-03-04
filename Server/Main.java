@@ -22,8 +22,9 @@ class Main {
       int connectionCount = 0;
       Thread newThread;
       ClientHandler newUserConnection;
+      Boolean isRunning = true;
 
-      while (true) {
+      while (isRunning) {
          try {
             serverSocketHandler = new ServerSocket(ServerPort);
 
@@ -37,7 +38,7 @@ class Main {
 
                System.out.println("Sending user connection information to handler");
                String name = inputStream.readUTF();
-               newUserConnection = new ClientHandler(userSocket, ("connection #" + (connectionCount + 1)), name, outputStream, inputStream);
+               newUserConnection = new ClientHandler(userSocket, ("connection #" + (connectionCount + 1)), name.toLowerCase(), outputStream, inputStream);
                clientsConnected.add(newUserConnection);
                newThread = new Thread(newUserConnection);
                newThread.start();
