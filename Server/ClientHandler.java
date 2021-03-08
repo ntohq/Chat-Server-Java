@@ -32,6 +32,11 @@ public class ClientHandler implements Runnable {
       System.out.println(client + "\n User's name is : " + name);
    }
 
+   String Cap(String str){
+      str = str.substring(0,1).toUpperCase() + str.substring(1);
+      return str;
+   }
+
    public void run()
    {
       String recievedTexted;
@@ -48,7 +53,7 @@ public class ClientHandler implements Runnable {
             String senderId = recievedTextTokenized.nextToken();
             String recivedMessage = recievedTextTokenized.nextToken();
             String recipient, dm; 
-            recipient = recivedMessage.substring(2).split(" ")[0];
+            recipient = recivedMessage.substring(2).split(" ")[0].toLowerCase();
             dm = recivedMessage.replaceFirst("^\\s*", "").substring((recipient.length() + 1));
                   
             
@@ -78,13 +83,13 @@ public class ClientHandler implements Runnable {
                {
                   if(client.name.equals(recipient))
                   {
-                     client.outputStream.writeUTF("Direct Message from: " + name + "#" + dm);
+                     client.outputStream.writeUTF("dm > " + Cap(name) + "#" + dm);
                   }
                } else
                {
                   if(!(client.name.equals(name)))
                   {
-                     client.outputStream.writeUTF(senderId + "#" + recivedMessage);
+                     client.outputStream.writeUTF(Cap(senderId) + "#" + recivedMessage);
                   }
                } 
             }
